@@ -24,7 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'first_node = krotov.first_node:main'
+            'time_printer = krotov.scripts.time_printer:main',
         ],
     },
 )
