@@ -24,7 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'time_printer = krotov.scripts.time_printer:main',
+            'even_pub = krotov.even_number_publisher:main',
+            'overflow_listener = krotov.overflow_listener:main',
         ],
     },
 )
