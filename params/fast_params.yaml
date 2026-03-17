@@ -1,0 +1,5 @@
+even_pub:
+  ros__parameters:
+    publish_frequency: 20.0
+    overflow_threshold: 50
+    topic_name: "/even_numbers_fast"

@@ -4,44 +4,49 @@ from rclpy.node import Node
 from std_msgs.msg import Int32
 
 class EvenNumberPublisher(Node):
-    """
-    Публикует чётные числа от 0 до 98 в /even_numbers (10 Гц).
-    При достижении 100 публикует 100 в /overflow и сбрасывает счётчик.
-    """
-
     def __init__(self):
-        # Имя узла: even_pub (как в задании)
-        super().__init__('even_pub')
+        super().__init__('even_pub') # Имя узла
 
-        # --- Издатели ---
-        self.even_publisher = self.create_publisher(Int32, '/even_numbers', 10)
+        # --- ОБЪЯВЛЯЕМ ПАРАМЕТРЫ (как в методичке) ---
+        self.declare_parameter('publish_frequency', 10.0) # Значение по умолчанию
+        self.declare_parameter('overflow_threshold', 100)
+        self.declare_parameter('topic_name', '/even_numbers')
+
+        # --- ЧИТАЕМ ЗНАЧЕНИЯ ПАРАМЕТРОВ ---
+        self.freq = self.get_parameter('publish_frequency').value
+        self.threshold = self.get_parameter('overflow_threshold').value
+        self.topic = self.get_parameter('topic_name').value
+
+        # Логируем, какие параметры загружены (для проверки)
+        self.get_logger().info(f'Параметры: частота={self.freq} Гц, порог={self.threshold}, топик="{self.topic}"')
+
+        # --- ИЗДАТЕЛИ ---
+        self.even_publisher = self.create_publisher(Int32, self.topic, 10)
         self.overflow_publisher = self.create_publisher(Int32, '/overflow', 10)
 
-        # --- Состояние ---
+        # --- СОСТОЯНИЕ ---
         self.counter = 0
-        self.max_value = 100
 
-        # --- Таймер на 10 Гц (0.1 сек) ---
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        # --- ТАЙМЕР (используем параметр self.freq) ---
+        timer_period = 1.0 / self.freq
+        self.timer = self.create_timer(timer_period, self.timer_callback)
 
-        self.get_logger().info("✅ Узел even_pub запущен. Публикация чётных чисел...")
+        self.get_logger().info("✅ Узел even_pub запущен и готов к работе.")
 
     def timer_callback(self):
-        # 1. Публикуем текущее чётное число
+        # ... (ваш код публикации и проверки переполнения БЕЗ ИЗМЕНЕНИЙ) ...
         msg = Int32()
         msg.data = self.counter
         self.even_publisher.publish(msg)
         self.get_logger().info(f'📤 Чётное: {msg.data}')
 
-        # 2. Проверка переполнения
-        if self.counter >= self.max_value:
+        if self.counter >= self.threshold: # Используем параметр self.threshold
             overflow_msg = Int32()
             overflow_msg.data = self.counter
             self.overflow_publisher.publish(overflow_msg)
             self.get_logger().warn(f'❗ ПЕРЕПОЛНЕНИЕ! Сброс. Отправлено: {overflow_msg.data}')
-            self.counter = 0  # Сброс
+            self.counter = 0
         else:
-            # Следующее чётное число
             self.counter += 2
 
 def main(args=None):

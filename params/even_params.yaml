@@ -1,0 +1,6 @@
+# even_params.yaml
+even_pub: # Имя узла ДОЛЖНО совпадать с тем, что вы укажете в launch-файле (name: 'even_pub')
+  ros__parameters:
+    publish_frequency: 8.0   # Частота 8 Гц, как в задании
+    overflow_threshold: 80    # Порог 80
+    topic_name: "/even_numbers"
